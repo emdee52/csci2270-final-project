@@ -3,6 +3,7 @@
 #include <string>
 using namespace std;
 
+
 void printMenu() {
     cout << "1. Initialize new repository" << endl;
     cout << "2. Add file" << endl;

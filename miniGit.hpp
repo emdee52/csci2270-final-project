@@ -4,6 +4,7 @@
 #include <string>
 using namespace std;
 
+
 struct doublyNode {
     int commitNumber;
     singlyNode * head;
