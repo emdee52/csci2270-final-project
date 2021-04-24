@@ -1,18 +1,19 @@
 #include "miniGit.hpp"
 #include <iostream>
 #include <string>
+#include <filesystem>
+#include <fstream>
 using namespace std;
 
 
 void printMenu() {
-    cout << "1. Initialize new repository" << endl;
-    cout << "2. Add file" << endl;
-    cout << "3. Remove file" << endl;
-    cout << "4. Commit changes" << endl;
-    cout << "5. Checkout" << endl;
-    cout << "6. Quit" << endl;
+    cout << "-----------------" << endl;
+    cout << "1. Add file" << endl;
+    cout << "2. Remove file" << endl;
+    cout << "3. Commit changes" << endl;
+    cout << "4. Checkout" << endl;
+    cout << "5. Quit" << endl;
 }
-
 
 int main() {
     miniGit g;
@@ -20,32 +21,48 @@ int main() {
     string filename;
     string toRemove;
     int commitNumber;
+    bool exists = false;
+    string init;
+    ifstream file;
+    cout << "Do you want to initialize new repository?" << endl;
+    cout << "1 = YES | 2 = NO" << endl;
+    cin >> init;
+    
+    if(stoi(init) == 1)
+    {
+        while (input != 5) {
+            printMenu();
+            cin >> input;
 
-    while (input != 6) {
-        printMenu();
-        cin >> input;
-
-        switch (input) {
-            case 1:
-                g.init();
-                break;
-            case 2:
-                cin >> filename;
-                g.add(filename);
-                break;
-            case 3:
-                cin >> toRemove;
-                g.remove(toRemove);
-                break;
-            case 4:
-                g.commit();
-                break;
-            case 5:
-                cin >> commitNumber;
-                g.checkout(commitNumber);
-                break;
-            default:
-                cout << "Invalid Option" << endl;
+            switch (input) {
+                case 1:
+                    do
+                    {
+                        cout << "Input file name" << endl;
+                        cin >> filename;
+                        filename = filename + ".txt";
+                        file.open(".minigit/" + filename);
+                        if(!file.is_open())
+                            cout << "File doesn't exist, enter a valid filename" << endl;
+                        else
+                            exists = true;
+                    } while(!exists);
+                    g.add(filename);
+                    break;
+                case 2:
+                    cin >> toRemove;
+                    g.remove(toRemove);
+                    break;
+                case 3:
+                    g.commit();
+                    break;
+                case 4:
+                    cin >> commitNumber;
+                    g.checkout(commitNumber);
+                    break;
+                default:
+                    cout << "Invalid Option" << endl;
+            }
         }
     }
 }

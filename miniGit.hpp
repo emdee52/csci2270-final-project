@@ -4,6 +4,7 @@
 #include <string>
 using namespace std;
 
+struct singlyNode;
 
 struct doublyNode {
     int commitNumber;
@@ -20,18 +21,19 @@ struct singlyNode {
 
 class miniGit {
     private:
-        doublyNode *head;
+        doublyNode *doublyHead;
 
-        doublyNode createNew();
+        doublyNode* createNew(doublyNode *node);
     public:
         miniGit();
         ~miniGit();
         void init();
+        bool checkFilename(string filename);
         void add(string filename);
-        void remove(string filename);
+        bool remove(string filename);
         void commit();
         void checkout(int commitNumber);
-        doublyNode search(string filename);
+        doublyNode* search();
 };
 
 #endif
