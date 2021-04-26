@@ -112,6 +112,22 @@ bool miniGit::remove(string filename) {
     }
 }
 
+bool miniGit::compareFiles(singlyNode *curr){
+    string filename = curr->fileName;
+    ifstream currFile;
+    currFile.open(filename);
+    ifstream repoFile;
+    repoFile.open(".minigit/" + curr->fileVersion);
+    string currFileLine;
+    string repoFileLine;
+    while(getline(currFile, currFileLine) && getline(repoFile, repoFileLine)){
+        if(currFileLine != repoFileLine){
+            return true;
+        }
+    }
+    return false;
+}
+
 void miniGit::commit() {
     /*
     1.  The current SLL should be traversed in its entirety, and for every node
@@ -134,9 +150,31 @@ void miniGit::commit() {
        string fileversion = currSLL->fileVersion;
        infile.open(".minigit/" + fileversion);
        if(!infile.is_open()){
-           
+           infile.close();
+           infile.open(currSLL->fileName);
+           ofstream output(".minigit/" + fileversion);
+           string line;
+           while(getline(infile, line)){
+               output << line;
+           }
+           infile.close();
+           output.close();
        }
        //Part (b)
+       else{
+           if(compareFiles(currSLL) == true){
+                infile.close();
+                infile.open(currSLL->fileName);
+                ofstream output(".minigit/" + fileversion);
+                string line;
+                while(getline(infile, line)){
+                    output << line;
+                }
+                infile.close();
+                output.close();
+           }
+       }
+       currSLL = currSLL->next;
    }
 }
 

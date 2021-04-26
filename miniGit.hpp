@@ -34,6 +34,7 @@ class miniGit {
         void commit();
         void checkout(int commitNumber);
         doublyNode* search();
+        bool compareFiles(singlyNode *curr);
 };
 
 #endif
