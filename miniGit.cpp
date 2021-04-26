@@ -1,6 +1,7 @@
 #include <iostream>
 #include "miniGit.hpp"
 #include <filesystem>
+#include <fstream>
 using namespace std;
 namespace fs = filesystem;
 
@@ -57,7 +58,6 @@ bool miniGit::checkFilename(string filename){
 
 void miniGit::add(string filename) {
   bool exists = false;
-
   
   if(checkFilename(filename) == false){
     singlyNode *temp = new singlyNode;
@@ -126,6 +126,18 @@ void miniGit::commit() {
             File is unchanged:  do nothing.
             File  is  changed:  copy  the  file  from  the  current  directory  to  the .minigit directory,  and  give  it  a  name  with  the  incremented  version  number.   Also,update the SLL node memberfileVersionto the incremented name.2.  Once all the files have been scanned,  the final step of the commit will create a newDoubly Linked List node of the repository.  An exact (deep) copy of the SLL from theprevious node shall be copied into the new DLL node.  The commit number of the newDLL node will be the previous nodes commit number incremented by one.
     */
+   doublyNode *currDLL = search();
+   singlyNode *currSLL = currDLL->head;
+   ifstream infile;
+   while(currSLL != nullptr){
+       //Part (a)
+       string fileversion = currSLL->fileVersion;
+       infile.open(".minigit/" + fileversion);
+       if(!infile.is_open()){
+           
+       }
+       //Part (b)
+   }
 }
 
 void miniGit::checkout(int commitNumber) {
