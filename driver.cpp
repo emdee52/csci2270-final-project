@@ -16,7 +16,6 @@ void printMenu() {
 }
 
 int main() {
-    miniGit g;
     int input = -1;
     string filename;
     string toRemove;
@@ -28,37 +27,53 @@ int main() {
     cout << "1 = YES | 2 = NO" << endl;
     cin >> init;
     
-    if(stoi(init) == 1)
-    {
+    if(stoi(init) == 1) {
+        cout << "Repository initialized." << endl;
+        miniGit g;
         while (input != 5) {
             printMenu();
             cin >> input;
 
             switch (input) {
                 case 1:
-                    do
-                    {
-                        cout << "Input file name" << endl;
-                        cin >> filename;
-                        filename = filename + ".txt";
-                        file.open(".minigit/" + filename);
-                        if(!file.is_open())
-                            cout << "File doesn't exist, enter a valid filename" << endl;
-                        else
-                            exists = true;
-                    } while(!exists);
-                    g.add(filename);
+                    if(g.getBlock())
+                        printf("Cannot add to a previous version.\n");
+                    else
+                    {                        
+                        do
+                        {
+                            cout << "Input file name" << endl;
+                            cin >> filename;
+                            filename = filename;
+                            file.open(filename);
+                            if(!file.is_open())
+                                cout << "File doesn't exist, enter a valid filename" << endl;
+                            else
+                                exists = true;
+                        } while(!exists);
+                        g.add(filename);
+                    }
                     break;
                 case 2:
-                    cin >> toRemove;
-                    g.remove(toRemove);
+                    if(g.getBlock())
+                        printf("Cannot remove files from a previous version.\n");
+                    else
+                    {
+                        cin >> toRemove;
+                        g.remove(toRemove);
+                    }
                     break;
                 case 3:
                     g.commit();
                     break;
                 case 4:
-                    cin >> commitNumber;
-                    g.checkout(commitNumber);
+                    if(g.getBlock())
+                        printf("Cannot commit a previous version.\n");
+                    else
+                    {    
+                        cin >> commitNumber;
+                        g.checkout(commitNumber);
+                    }
                     break;
                 default:
                     cout << "Invalid Option" << endl;

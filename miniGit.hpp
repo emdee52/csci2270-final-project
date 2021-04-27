@@ -16,13 +16,14 @@ struct doublyNode {
 struct singlyNode {
     string fileName; // Name of local file
     string fileVersion; // Name of file in .minigit folder
+    string versionNumber = 00;
     singlyNode * next;
 };
 
 class miniGit {
     private:
         doublyNode *doublyHead;
-
+        bool checkoutBlock;
         doublyNode* createNew(doublyNode *node);
     public:
         miniGit();
@@ -33,7 +34,8 @@ class miniGit {
         bool remove(string filename);
         void commit();
         void checkout(int commitNumber);
-        doublyNode* search();
+        bool getBlock();
+        //doublyNode* search();
         bool compareFiles(singlyNode *curr);
 };
 
