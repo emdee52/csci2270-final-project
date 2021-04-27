@@ -128,6 +128,7 @@ bool miniGit::remove(string filename) {
 }
 
 bool miniGit::compareFiles(singlyNode *curr){
+    cout << "entered compare func" << endl;
     string filename = curr->fileName;
     ifstream currFile;
     currFile.open(filename);
@@ -135,11 +136,19 @@ bool miniGit::compareFiles(singlyNode *curr){
     repoFile.open(".minigit/" + curr->fileVersion);
     string currFileLine;
     string repoFileLine;
-    while(getline(currFile, currFileLine) && getline(repoFile, repoFileLine)){
+    while(true){
+        cout << "entered compare while loop" << endl;
+        if(!getline(currFile, currFileLine) || !getline(repoFile, repoFileLine)){
+            return true;
+        }
         if(currFileLine != repoFileLine){
             return true;
         }
+        if(currFile.eof() && repoFile.eof()){
+            return false;
+        }
     }
+    cout << "exited while loop" << endl;
     return false;
 }
 
@@ -158,12 +167,18 @@ void miniGit::commit() {
             File  is  changed:  copy  the  file  from  the  current  directory  to  the .minigit directory,  and  give  it  a  name  with  the  incremented  version  number.   Also,update the SLL node memberfileVersionto the incremented name.2.  Once all the files have been scanned,  the final step of the commit will create a newDoubly Linked List node of the repository.  An exact (deep) copy of the SLL from theprevious node shall be copied into the new DLL node.  The commit number of the newDLL node will be the previous nodes commit number incremented by one.
     */
    doublyNode *currDLL = search(doublyHead);
+   cout << "accessing currSLL" << endl;
    singlyNode *currSLL = currDLL->head;
+   cout << "accessed" << endl;
    ifstream infile;
    while(currSLL != nullptr){
+       cout << "entered commit while loop" << endl;
        //Part (a)
+       cout << currSLL;
        string fileversion = currSLL->fileVersion;
+       cout << "opening repo file" << endl;
        infile.open(".minigit/" + fileversion);
+       cout << "opened file" << endl;
        if(!infile.is_open()){
            infile.close();
            infile.open(currSLL->fileName);
@@ -177,14 +192,19 @@ void miniGit::commit() {
        }
        //Part (b)
        else{
+           cout << "option b called" << endl;
            if(compareFiles(currSLL) == true){
+               cout<< "compare called" << endl;
                 infile.close();
+                cout << "closed file" << endl;
                 infile.open(currSLL->fileName);
                 int newVersionNumber = stoi(currSLL->versionNumber) + 1;
                 currSLL->versionNumber = to_string(newVersionNumber);
                 currSLL->fileVersion = currSLL->fileVersion + currSLL->versionNumber;
                 ofstream output;
-                output.open((".minigit/" + currSLL->fileVersion));
+                cout << "trying to open output file" << endl;
+                output.open((".minigit/" + currSLL->fileVersion), ofstream::trunc);
+                cout << "opened output" << endl;
                 string line;
                 while(getline(infile, line)){
                     output << line << '\n';
@@ -200,14 +220,21 @@ void miniGit::commit() {
     newDoubly->previous = currDLL;
     newDoubly->next = nullptr;
     currDLL->next = newDoubly;
-    while(currDLL->head != nullptr){
-        newDoubly->head = new singlyNode;
-        newDoubly->head = currDLL->head;
-        newDoubly->head->fileName = currDLL->head->fileName;
-        newDoubly->head->fileVersion = currDLL->head->fileVersion;
-        newDoubly->head->versionNumber = currDLL->head->versionNumber;
-        currDLL->head = currDLL->head->next;
-        newDoubly->head = newDoubly->head->next;
+    singlyNode *crawler = currDLL->head;
+    newDoubly->head = new singlyNode;
+    newDoubly->head->fileName = currDLL->head->fileName;
+    newDoubly->head->fileVersion = currDLL->head->fileVersion;
+    newDoubly->head->versionNumber = currDLL->head->versionNumber;
+    singlyNode *curr = newDoubly->head;
+    crawler = crawler->next;
+    while(crawler != nullptr){
+        singlyNode *temp = new singlyNode;
+        temp->fileName = crawler->fileName;
+        temp->fileVersion = crawler->fileVersion;
+        temp->versionNumber = crawler->versionNumber;
+        crawler = crawler->next;
+        curr->next = temp;
+        curr = temp;
     }
 }
 
