@@ -153,89 +153,77 @@ bool miniGit::compareFiles(singlyNode *curr){
 }
 
 void miniGit::commit() {
-    /*
-    1.  The current SLL should be traversed in its entirety, and for every node
-        (a)  Check whether the corresponding fileVersion file exists in .minigit directory.
-            If thefileVersionfiledoes notexist, copy the file from the current directory into the.minigit directory.  
-            The newly copied file should get the name from the node’s fileVersion member.   
-            (Note:  this  will  only  be  the  case  when  a  file  is added to the repository for the first time.)
-        (b)  If the fileVersion file does exist in .minigit, check whether the current directory file has been changed 
-            (i.e.  has it been changed by the user?)  with respect to the fileVersion file.  
-            (To do the comparison, you can read in the file from the current directory into one string and read in the file from the .minigit directory into another string, and check for equality.)  
-        Based on the comparison result, do the following: 
-            File is unchanged:  do nothing.
-            File  is  changed:  copy  the  file  from  the  current  directory  to  the .minigit directory,  and  give  it  a  name  with  the  incremented  version  number.   Also,update the SLL node memberfileVersionto the incremented name.2.  Once all the files have been scanned,  the final step of the commit will create a newDoubly Linked List node of the repository.  An exact (deep) copy of the SLL from theprevious node shall be copied into the new DLL node.  The commit number of the newDLL node will be the previous nodes commit number incremented by one.
-    */
-   doublyNode *currDLL = search(doublyHead);
-   cout << "accessing currSLL" << endl;
-   singlyNode *currSLL = currDLL->head;
-   cout << "accessed" << endl;
-   ifstream infile;
-   while(currSLL != nullptr){
-       cout << "entered commit while loop" << endl;
-       //Part (a)
-       cout << currSLL;
-       string fileversion = currSLL->fileVersion;
-       cout << "opening repo file" << endl;
-       infile.open(".minigit/" + fileversion);
-       cout << "opened file" << endl;
-       if(!infile.is_open()){
-           infile.close();
-           infile.open(currSLL->fileName);
-           ofstream output(".minigit/" + fileversion);
-           string line;
-           while(getline(infile, line)){
-               output << line << '\n';
-           }
-           infile.close();
-           output.close();
-       }
-       //Part (b)
-       else{
-           cout << "option b called" << endl;
-           if(compareFiles(currSLL) == true){
-               cout<< "compare called" << endl;
-                infile.close();
-                cout << "closed file" << endl;
-                infile.open(currSLL->fileName);
-                int newVersionNumber = stoi(currSLL->versionNumber) + 1;
-                currSLL->versionNumber = to_string(newVersionNumber);
-                currSLL->fileVersion = currSLL->fileVersion + currSLL->versionNumber;
-                ofstream output;
-                cout << "trying to open output file" << endl;
-                output.open((".minigit/" + currSLL->fileVersion), ofstream::trunc);
-                cout << "opened output" << endl;
-                string line;
-                while(getline(infile, line)){
-                    output << line << '\n';
-                }
-                infile.close();
-                output.close();
+    doublyNode *currDLL = doublyHead;
+    while (currDLL->next != NULL) {
+        currDLL = currDLL->next;
+    }
+
+    singlyNode *currSLL = currDLL->head;
+    ifstream gitfile;
+    while (currSLL != NULL) {
+        gitfile.open(".minigit/" + currSLL->fileName + currSLL->versionNumber);
+
+        if (!gitfile.is_open()) { // file doesn't exist
+            ofstream out_file(".minigit/" + currSLL->fileName + currSLL->versionNumber);
+            ifstream in_file(currSLL->fileName);
+            string line;
+            while(getline(in_file, line)) {
+                out_file << line << endl;
             }
-       }       
-       currSLL = currSLL->next;
+            out_file.close();
+            in_file.close();
+
+        } else { // file exists
+            if (compareFiles(currSLL)) {
+                int newVer = stoi(currSLL->versionNumber) + 1;
+
+                if (newVer < 10) {
+                    currSLL->versionNumber = "0" + to_string(newVer);
+                } else {
+                    currSLL->versionNumber = to_string(newVer);
+                }
+                currSLL->fileVersion = currSLL->fileName + currSLL->versionNumber;
+                //cout << currSLL->versionNumber << endl;
+
+                ofstream out_file(".minigit/" + currSLL->fileName + currSLL->versionNumber);
+                ifstream in_file(currSLL->fileName);
+                string line;
+                while(getline(in_file, line)) {
+                    out_file << line << endl;
+                }
+                out_file.close();
+                in_file.close();
+            }
+        }
+        gitfile.close();
+        currSLL = currSLL->next;
     }
-    doublyNode* newDoubly = new doublyNode;
-    newDoubly->commitNumber = currDLL->commitNumber++;
-    newDoubly->previous = currDLL;
-    newDoubly->next = nullptr;
-    currDLL->next = newDoubly;
-    singlyNode *crawler = currDLL->head;
-    newDoubly->head = new singlyNode;
-    newDoubly->head->fileName = currDLL->head->fileName;
-    newDoubly->head->fileVersion = currDLL->head->fileVersion;
-    newDoubly->head->versionNumber = currDLL->head->versionNumber;
-    singlyNode *curr = newDoubly->head;
-    crawler = crawler->next;
-    while(crawler != nullptr){
-        singlyNode *temp = new singlyNode;
-        temp->fileName = crawler->fileName;
-        temp->fileVersion = crawler->fileVersion;
-        temp->versionNumber = crawler->versionNumber;
-        crawler = crawler->next;
-        curr->next = temp;
-        curr = temp;
+
+    doublyNode *newDLL = new doublyNode;
+    newDLL->commitNumber = currDLL->commitNumber + 1;
+    newDLL->previous = currDLL;
+    newDLL->next = NULL;
+    currDLL->next = newDLL;
+
+    currSLL = currDLL->head;
+    singlyNode *prev = NULL;
+    while (currSLL != NULL) {
+        singlyNode *newSLL = new singlyNode;
+        newSLL->fileName = currSLL->fileName;
+        newSLL->versionNumber = currSLL->versionNumber;
+        newSLL->fileName = currSLL->fileName;
+        newSLL->fileVersion = currSLL->fileVersion;
+        newSLL->next = NULL;
+
+        if (prev == NULL) {
+            newDLL->head = newSLL;
+        } else {
+            prev->next = newSLL;
+        }
+        prev = newSLL;
+        currSLL = currSLL->next;
     }
+
 }
 
 void miniGit::checkout(int commitNumber) {
