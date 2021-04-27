@@ -170,7 +170,7 @@ void miniGit::commit() {
            ofstream output(".minigit/" + fileversion);
            string line;
            while(getline(infile, line)){
-               output << line;
+               output << line << '\n';
            }
            infile.close();
            output.close();
@@ -183,12 +183,12 @@ void miniGit::commit() {
                 int newVersionNumber = stoi(currSLL->versionNumber) + 1;
                 currSLL->versionNumber = to_string(newVersionNumber);
                 currSLL->fileVersion = currSLL->fileVersion + currSLL->versionNumber;
-                ofstream output(".minigit/" + currSLL->fileVersion);
+                ofstream output;
+                output.open((".minigit/" + currSLL->fileVersion));
                 string line;
                 while(getline(infile, line)){
-                    output << line;
+                    output << line << '\n';
                 }
-                
                 infile.close();
                 output.close();
             }
@@ -234,7 +234,7 @@ void miniGit::checkout(int commitNumber) {
         }
     }
     currFile.close(), commitFile.close(), output.close();
-    cout << "Check out your requested commit's file in your current directory!" << endl;
+    cout << "Check out your requested commit file in your current directory!" << endl;
 }
 
 bool miniGit::getBlock() {

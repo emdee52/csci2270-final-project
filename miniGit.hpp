@@ -16,7 +16,7 @@ struct doublyNode {
 struct singlyNode {
     string fileName; // Name of local file
     string fileVersion; // Name of file in .minigit folder
-    string versionNumber = 00;
+    string versionNumber = "00";
     singlyNode * next;
 };
 
