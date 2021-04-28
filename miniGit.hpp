@@ -25,18 +25,19 @@ class miniGit {
         doublyNode *doublyHead;
         bool checkoutBlock;
         doublyNode* createNew(doublyNode *node);
+        bool compareFiles(singlyNode *curr);
+        bool checkFilename(string filename);
     public:
         miniGit();
         ~miniGit();
         void init();
-        bool checkFilename(string filename);
         void add(string filename);
-        bool remove(string filename);
+        void remove(string filename);
         void commit();
         void checkout(int commitNumber);
         bool getBlock();
-        //doublyNode* search();
-        bool compareFiles(singlyNode *curr);
+        void printList();
+        int latestCommitNum();
 };
 
 #endif
